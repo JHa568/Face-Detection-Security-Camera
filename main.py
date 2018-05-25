@@ -50,7 +50,7 @@ def DetectPerson():
                         minNeighbors=3,
                         minSize=(100,100),
                         flags=cv.CASCADE_SCALE_IMAGE)#change
-
+        # multiprocess the person detection
         for (x, y, w, h) in personDetect:
             cv.rectangle(image, (x,y), (w+x, h+y), (0,255,0), 2)# border around the object
             Notify(image)# Notify the owner of the house, 1 thread
