@@ -27,6 +27,7 @@ class Camera:
         #Saving image
         imageName = '/Images/TestImage.jpg'
         logImage.File(Camera.imageSaved)#Log for saving image
+        print("Logged!!!")# This is a test for git hub
         camera.annotate_text = self.DateNTime#imageDoc
         camera.capture(self.original_path+imageName)
 
