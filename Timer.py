@@ -6,26 +6,26 @@ class Timer:
 
     def TimeStamp(self):
         localTime = time.asctime(time.localtime(time.time()))
-        return localTime
+        return localTime# computer localTime
 
     def Relay(self):
         previous = 0
-        timeLimit = self.timeLimit#time limit
+        timeLimit = self.timeLimit# time limit
         ended = False
         while True:
-            currentTime = time.time()#current time in seconds
+            currentTime = time.time()# current time in seconds
             if previous == 0:
                 previous = currentTime
             else:
                 while(currentTime - previous) < timeLimit:
                     currentTime = time.time()
                     ended = False
-                    #Processing Stops
+                    # Processing Stops
                     return ended
                 previous = currentTime
                 ended = True
                 return ended
-                #Processors continue
+                # Processors continue
                 if ended == True:
                     return ended
                     break

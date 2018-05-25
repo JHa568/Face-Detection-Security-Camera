@@ -42,10 +42,10 @@ class Camera:
         #Record Video
         if webserverButtonRequest == True:# want to record video
             videoName = '/Video/video.h264
-            logRecord.File(Camera.startRecording)
+            logRecord.File(Camera.startRecording)# Log the recording video
             camera.start_preview()
-            camera.start_recording(self.original_path+videoName)
-        #use a "stop" recording function
+            camera.start_recording(self.original_path+videoName)# record video
+        # stop recording when button is pressed
         else:
             try:
                 camera.stop_recording()

@@ -34,21 +34,21 @@ class Emails:
         try:
             msg = MIMEMultipart()#sending multiple attachments e.g. images, texts
             msg['Subject'] = 'PERSON AT FRONT DOOR:-  ' + Emails.localTime
-            msg['From'] = Emails.login
+            msg['From'] = Emails.login# login into the email
             msg['To'] = ', '.join(Emails.clients)
-            text = MIMEText(self.message)
-            image = MIMEImage(self.imageFileName)
+            text = MIMEText(self.message)# txt of the email
+            image = MIMEImage(self.imageFileName)# image of the email
             msg.attach(text)#send text over email
             msg.attach(image)#attach the image to the email
             server = smtplib.SMTP_SSL(Emails.host, Emails.port)
             server.login(Emails.login, Emails.password)
             server.sendmail(Emails.login, Emails.clients, msg.as_string())#sends the email (with attachmemnts and texts)
             print('Sucessfully sent!!!! ' + str(Emails.localTime))
-            lgEmail.File("Email[SENT]")
+            lgEmail.File("Email[SENT]")# log: sent email
             server.quit()
 
         except:
             ErrorMess = "Email: Connection Error or SSL Error has occured"
-            print(ErrorMess)
-            lgEmail.File("Email[ERROR]")
+            print(ErrorMess)# get rid of this
+            lgEmail.File("Email[ERROR]")# log: email not sent
             pass

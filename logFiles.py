@@ -6,11 +6,11 @@ class Log:
         self.original_path = orginal_path
 
     def File(self, message):# forwarding the parameter "message" to make a custom judgement of logging
-        logName = '/Logs/logsDetection'
+        logName = '/Logs/logsDetection'# location of logFile
         fileLog =  open(self.original_path+logName, 'r').read().split('\n')
         for evryLog in fileLog:
-            self.tempArray.append(evryLog)
-        noOfLogs = len(self.tempArray)
+            self.tempArray.append(evryLog)# List all lines of txt
+        noOfLogs = len(self.tempArray)# add them to a temporary array
         logString = "%s) %s: %s" % (noOfLogs, message,self.DateNTime)
         fileLog = open(self.original_path+logName, 'a')
         fileLog.write(str(logString)+'\n')

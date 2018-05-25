@@ -1,5 +1,7 @@
 from Email import Emails
-
+'''
+This is the Format of the message within the email
+'''
 class Format:
     #breakers to split text up
     breaker0 = '#' * 30

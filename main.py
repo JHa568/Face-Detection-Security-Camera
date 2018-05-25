@@ -1,5 +1,5 @@
 import time
-import threading as sThread#Organise tasks
+import threading as silk#Organise tasks
 import cv2 as cv
 import numpy
 from Camera import Camera
