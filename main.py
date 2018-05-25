@@ -19,7 +19,7 @@ rawCapture = PiRGBArray(camera, size=(250, 250))
 cam1 = Camera(orginal_path, DateNTime)
 
 original_path = '/home/pi/Desktop/FrontDoorDetectProject/'
-filename = open((original_path+"Images/TestImage.jpg"), 'rb').read()#read image in binary mode
+filename = open((original_path+"Images/TestImage.jpg"), 'rb').read()# read image in binary mode
 em = Emails(Format.message, filename, original_path)#creating a new object
 
 timeNotDetect = Timer(120)
