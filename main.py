@@ -1,7 +1,8 @@
 import time
+import numpy
+import multiprocessing as process# both multithreading and processing, simultaneous operation
 import threading as silk#Organise tasks
 import cv2 as cv
-import numpy
 from Camera import Camera
 from picamera import PiCamera
 from logFiles import Log
@@ -68,4 +69,4 @@ def DetectPerson():
 if __name__ == '__main__':
     # apply all multithreading applications here,
     DetectPerson()# 2 threads, multiprocessing
-    #Webserver and email are multithreaded
+    # Webserver and email are multithreaded
