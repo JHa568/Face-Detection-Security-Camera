@@ -1,54 +1,59 @@
-import time
+from imutils.video import VideoStream
 import cv2 as cv
-from picamera import PiCamera
-from logFiles import Log
-from Timer import Timer
+import numpy as np
+import imutils
+import time
 
-t1 = Timer(10)
-class Camera:
-    imageSaved = "Image Saved"
-    startRecording = "Start Recording"
-    stopRecording = "Stopped Recording"
+pxl = 256
+res = (pxl,pxl)
+fps = 25
+haarcascadeHeadNShoulders = "HS.xml"
 
-    def __init__(self, original_path, DateNTime):
-        self.DateNTime = DateNTime
-        self.original_path = original_path
-
-    def CVSaveImage(self, frame):# using OpenCV to capture image
-        img_name = "/Images/TestImage.jpg"
-        cv2.imwrite(self.original_path+img_name, frame)
+class VideoCamera(object):
+    def __init__(self, original_path, date_n_time):
+        self.original_path = orginal_path
+        self.date_n_time = date_n_time
+        self.picam = VideoStream(usePiCamera=True, resolution=res, framerate=fps).start()
+        print("{CPU INFO}: Camera warming up......")
+        time.sleep(2)
+        print("Starting......")
 
     def SaveImage(self):
-        logImage = Log(self.DateNTime, self.original_path)
-        camera = PiCamera()
-        camera.resolution = (400, 400)#resolution of image
-        camera.rotation = 180
-        camera.annotate_text_size = 20
-        #Saving image
-        imageName = '/Images/TestImage.jpg'
-        logImage.File(Camera.imageSaved)#Log for saving image
-        print("Logged!!!")# This is a test for git hub
-        camera.annotate_text = self.DateNTime#imageDoc
-        camera.capture(self.original_path+imageName)
+        #Capture the image
+        frame = self.picam.read()
+        _, jpeg = cv.imencode(".jpg", frame)
+        return jpeg.tobytes()
 
-    def Record(self, webserverButtonRequest):#Revise on this
-        logRecord = Log(self.DateNTime, self.original_path)
-        camera = PiCamera()
-        camera.resolution = (400, 400)
-        camera.framerate = 30
-        camera.rotation = 180
-        camera.annotate_text_size = 20
-        camera.annotate_text = self.DateNTime
-        #Record Video
-        if webserverButtonRequest == True:# want to record video
-            videoName = '/Video/video.h264
-            logRecord.File(Camera.startRecording)# Log the recording video
-            camera.start_preview()
-            camera.start_recording(self.original_path+videoName)# record video
-        # stop recording when button is pressed
-        else:
-            try:
-                camera.stop_recording()
-                camera.stop_preview()
-            except:
-                pass
+    def RecordStream(self):# This can be only accessed
+        #Record the stream
+        frame = self.picam.read()
+        frame = imutils.resize(frame, width=pxl)
+        fourcc = cv.VideoWriter_fourcc("MJPG")# video compression format and color/pixel format of video
+        (h, w) = frame.shape[:2]
+        writer = cv.VideoWriter("Video/Video.avi", fourcc, fps, (w, h), True)
+        writer.write(frame)# Test this module if it works or not
+
+    def stopRecordingStream(self):
+        writer.release()
+
+    def get_Person(self):
+        #find the person in the stream
+        frame = self.picam.read()# get the camera from the stream
+        frame = imutils.rotate(frame, angle=180)
+        frame = imutils.resize(frame, width=pxl)
+        gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
+        personDetected = False
+        haarcascadeClassifier = cv.CascadeClassifier(haarcascadeHeadNShoulders)
+        detectPerson = haarcascadeClassifier.detectMultiScale(gray,
+                                                          scaleFactor=1.2,
+                                                          minNeighbors=3,
+                                                          minSize=(30,30),
+                                                          flags=cv.CASCADE_SCALE_IMAGE)
+        if len(detectPerson) > 0:
+            personDetected = True# if detected return True
+        for (x,y,w,h) in detectPerson:
+            cv.rectangle(frame, (x,y), (x+w, y+h), (0, 255, 0), 2)
+
+        _, jpeg = cv.imencode('.jpg', frame)# image of frame w/ rectangle
+
+        return (jpeg.tobytes(), personDetected)

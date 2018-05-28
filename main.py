@@ -1,7 +1,7 @@
 import time
-import threading as silk#Organise tasks
-import cv2 as cv
 import numpy
+import threading as thrd# Use for email, webserver and maybe detecting object
+import cv2 as cv
 from Camera import Camera
 from picamera import PiCamera
 from logFiles import Log
@@ -10,62 +10,36 @@ from Email import Emails
 from Timer import Timer
 from picamera.array import PiRGBArray
 
-haarcascadeHeadnShoulders = 'HS.xml'# name of haarcascade
-camera = PiCamera()
-camera.resolution = (250, 250)# resolution of the camera
-camera.rotation = 180
-camera.framerate = 25
-rawCapture = PiRGBArray(camera, size=(250, 250))
-cam1 = Camera(orginal_path, DateNTime)
-
+# Modify this and clean this up
 original_path = '/home/pi/Desktop/FrontDoorDetectProject/'
-filename = open((original_path+"Images/TestImage.jpg"), 'rb').read()# read image in binary mode
-em = Emails(Format.message, filename, original_path)#creating a new object
+DateNTime = time.asctime(time.localtime(time.time()))# Time stamp on the image
+logEmailSent = Log(DateNTime, original_path)
+em = Emails(Format.message)# getting the image captured
+piVCam = VideoCamera(orginal_path, DateNTime)
+ended = False
 
-timeNotDetect = Timer(120)
-DateNTime = t1.TimeStamp()# Time stamp on the image
-time.sleep(1)#let the camrera 'warm up'
-
-def Notify(image):# test this on the Pi
-    if emailSent == True:
-        t1.Relay()# timer for 3 minute duration to not spam the user w/ email
-        emailSent = False
-        pass
-    else:
-        # capture image from the camera & sent image
-        cam1.SaveImage()# Using the Pi camera capturing image
-        #cam1.CVSaveImage(image)# Using OpenCV capturing image
-        em.sendMail()
-        emailSent = True
-        pass
-
-def DetectPerson():
-    for frame in camera.capture_continuous(rawCapture, format='bgr', use_video_port=True):
-        image = frame.array
-        gray = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
-
-        haarcascadeClassifier = cv.CascadeClassifier(haarcascadeHeadnShoulders)
-        personDetect = haarcascadeClassifier.detectMultiScale(gray,
-                        scaleFactor=1.2,
-                        minNeighbors=3,
-                        minSize=(100,100),
-                        flags=cv.CASCADE_SCALE_IMAGE)#change
-        # multiprocess the person detection
-        for (x, y, w, h) in personDetect:
-            cv.rectangle(image, (x,y), (w+x, h+y), (0,255,0), 2)# border around the object
-            Notify(image)# Notify the owner of the house, 1 thread
-
-        cv.imshow("Frame", image)# show a video in colour
-
-        # This key mechanism should be obsolete
-        key = cv.waitKey(1) & 0xFF
-        rawCapture.truncate(0)
-
-        if key == ord("q"):# when pressed 'q' on keyboard
-            break# end program
+def get_PersonInFrame():
+    global ended
+    while True:
+        frame, found_person = piVCam.get_PersonInFrame()
+        timeInterval = 540# 9 minutes timer
+        currentTime = time.time()
+        previousTime = 0
+        if previousTime == 0:
+            previousTime = currentTime
+        else:
+            while found_person and (currentTime - previousTime) < timeInterval:
+                currentTime = time.time()
+            previousTime = currentTime
+            ended = True
+            if ended = True:
+                logEmailSent.File("Email Sent")# test this under threading
+                em.sendmail(piVCam.SaveImage())# Put the email sending into another thread
+                previousTime = 0
+                break
 
 
 if __name__ == '__main__':
-    # apply all multithreading applications here,
-    DetectPerson()# 2 threads, multiprocessing
-    #Webserver and email are multithreaded
+    get_PersonInFrame()# thread
+    # apply all multithreading applications here
+    # Webserver and email are multithreaded
