@@ -14,24 +14,27 @@ class VideoCamera(object):
         self.original_path = orginal_path
         self.date_n_time = date_n_time
         self.picam = VideoStream(usePiCamera=True, resolution=res, framerate=fps).start()
+        print("{CPU INFO}: Camera warming up......")
+        time.sleep(2)
+        print("Starting......")
 
     def SaveImage(self):
         #Capture the image
         frame = self.picam.read()
-        frame.an
         _, jpeg = cv.imencode(".jpg", frame)
         return jpeg.tobytes()
 
-    def RecordStream(self):# This can be only accessed
+    def stopRecordingStream(self):# stop the recording
+        writer.release()
+        
+    def RecordStream(self):
         #Record the stream
-        capturing = True
         frame = self.picam.read()
         frame = imutils.resize(frame, width=pxl)
         fourcc = cv.VideoWriter_fourcc("MJPG")# video compression format and color/pixel format of video
         (h, w) = frame.shape[:2]
-        writer = cv.VideoWriter("Video.avi", fourcc, fps, (w, h), True)
+        writer = cv.VideoWriter("Video/Video.avi", fourcc, fps, (w, h), True)
         writer.write(frame)# Test this module if it works or not
-        return capturing# this maybe obsolete
 
     def get_Person(self):
         #find the person in the stream

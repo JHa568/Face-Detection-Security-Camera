@@ -21,7 +21,7 @@ class Emails:
     clients = ['e94282861@gmail.com']
     localTime = time.asctime(time.localtime(time.time()))
 
-    def __init__(self, message, imageFileName, path):
+    def __init__(self, message):
         self.message = message
         self.imageFileName = imageFileName
         self.path = path
@@ -29,15 +29,15 @@ class Emails:
     def sendVideo(self):
         # find a way to send a video over the gmail webserver
         print('SentVideo')
-    def sendMail(self):
+    def sendMail(self, frame):
         lgEmail = Log(Emails.localTime, self.path)
         try:
-            msg = MIMEMultipart()#sending multiple attachments e.g. images, texts
+            msg = MIMEMultipart()# sending multiple attachments e.g. images, texts
             msg['Subject'] = 'PERSON AT FRONT DOOR:-  ' + Emails.localTime
             msg['From'] = Emails.login# login into the email
             msg['To'] = ', '.join(Emails.clients)
             text = MIMEText(self.message)# txt of the email
-            image = MIMEImage(self.imageFileName)# image of the email
+            image = MIMEImage(frame)# image of the email
             msg.attach(text)#send text over email
             msg.attach(image)#attach the image to the email
             server = smtplib.SMTP_SSL(Emails.host, Emails.port)
