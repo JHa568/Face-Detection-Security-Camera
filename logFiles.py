@@ -11,7 +11,7 @@ class Log:
         for evryLog in fileLog:
             self.tempArray.append(evryLog)# List all lines of txt
         noOfLogs = len(self.tempArray)# add them to a temporary array
-        logString = "%s) %s: %s" % (noOfLogs, message,self.DateNTime)
+        logString = "%s) %s: %s" % (noOfLogs, message, self.DateNTime)
         fileLog = open(self.original_path+logName, 'a')
         fileLog.write(str(logString)+'\n')
         fileLog.close()
