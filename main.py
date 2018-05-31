@@ -2,7 +2,7 @@
 #created: 17/03/18
 import time
 import numpy
-import threading as thrd# Use for email, webserver and maybe detecting object
+import threading# Use for email
 import cv2 as cv
 from Camera import Camera
 from picamera import PiCamera
