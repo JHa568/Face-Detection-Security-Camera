@@ -24,16 +24,14 @@ class Emails(threading.Thread):
     clients = ['e94282861@gmail.com']
     localTime = time.asctime(time.localtime(time.time()))
 
-    def __init__(self, message):
+    def __init__(self, message, orginal_path):
         threading.Thread.__init__(self)# threading the email module
         self.message = message
-        self.imageFileName = imageFileName
-        self.path = path
+        self.orginal_path = orginal_path
         #The message of the email
-    '''
-    def sendVideo(self, orginal_path):
+
+    def sendVideo(self):
         # find a way to send a video over the gmail webserver
-        threadLock.acquire()
         mainMessage = 'Video Recorded:- ' + Emails.localTime
         filename = 'Video.avi'
         try:
@@ -43,7 +41,7 @@ class Emails(threading.Thread):
             msg['To'] = ', '.join(Emails.clients)
             text = MIMEText(mainMessage)
             video = MIMEBase('application', "octet-stream")
-            file = open(orginal_path+filename, "rb")
+            file = open(self.orginal_path+filename, "rb")
             video.set_payload(file.read())
             Encoders.encode_base64(video)
             msg.attach(video)
@@ -55,11 +53,8 @@ class Emails(threading.Thread):
         except:
             lgEmail.File("SendingVideo[ERROR]")# log: email not sent
             pass
-        threadLock.release()
-        thread.join()
-    '''
+
     def sendMail(self, frame):
-        threadLock.acquire()
         lgEmail = Log(Emails.localTime, self.path)
         try:
             msg = MIMEMultipart()# sending multiple attachments e.g. images, texts
@@ -67,7 +62,7 @@ class Emails(threading.Thread):
             msg['From'] = Emails.login# login into the email
             msg['To'] = ', '.join(Emails.clients)
             text = MIMEText(self.message)# txt of the email
-            image = MIMEImage(frame)# image of the email
+            image = MIMEImage(self.frame)# image of the email
             msg.attach(text)#send text over email
             msg.attach(image)#attach the image to the email
             server = smtplib.SMTP_SSL(Emails.host, Emails.port)
@@ -78,5 +73,13 @@ class Emails(threading.Thread):
         except:
             lgEmail.File("SendingEmail [ERROR]")# log: email not sent
             pass
-        threadLock.release()
-        thread.join()
+
+    def runFunc(self, function_to_call, frame=None):
+        threadLock = threading.Lock()
+        threadLock.acquire()
+        # this will run the executable function
+        if function_to_call == "sendVideo":
+            sendVideo()
+        elif function_to_call == "sendMail":
+            sendMail(frame)
+        threadLock.release()# end the thread
