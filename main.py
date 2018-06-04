@@ -4,6 +4,7 @@ import time
 import numpy
 import threading# Use for email
 import cv2 as cv
+from flask import Flask, render_template
 from Camera import Camera
 from picamera import PiCamera
 from logFiles import Log
@@ -39,6 +40,10 @@ def get_PersonInFrame():
             previousTime = 0
 
 if __name__ == '__main__':
-    get_PersonInFrame()# thread this
+    t = threading.Thread(target=get_PersonInFrame, args=())# thread this
+    t.daemon = True
+    t.start()
+    #threading.start_new_thread(get_PersonInFrame, None)
+    #threading.daemon()# work on this
     # apply all multithreading applications here
     # Webserver and email are multithreaded

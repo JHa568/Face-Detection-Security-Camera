@@ -74,12 +74,13 @@ class Emails(threading.Thread):
             lgEmail.File("SendingEmail [ERROR]")# log: email not sent
             pass
 
-    def runFunc(self, function_to_call, frame=None):
+    def runFunc(self, function_to_call, frame=None):# decides whether it is going to run either the send email or video option
         threadLock = threading.Lock()
         threadLock.acquire()
-        # this will run the executable function
+        # this will run the intended function
         if function_to_call == "sendVideo":
             sendVideo()
         elif function_to_call == "sendMail":
             sendMail(frame)
+
         threadLock.release()# end the thread
