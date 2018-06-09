@@ -1,3 +1,5 @@
+#@author Jamie Ha
+#created: 17/03/18
 from imutils.video import VideoStream# to be more efficient directly call 'PiVideoStream'
 import cv2 as cv
 import numpy as np
@@ -7,7 +9,7 @@ import time
 pxl = 256
 res = (pxl,pxl)
 fps = 25
-haarcascadeHeadNShoulders = "HS.xml"
+haarcascadeHeadNShoulders = "HS.xml"# Use a different model
 
 class VideoCamera(object):
     def __init__(self, original_path, date_n_time):
@@ -20,25 +22,25 @@ class VideoCamera(object):
         print("Starting......")
 
     def SaveImage(self):
-        #Capture the image
+        #Captures the image
         frame = self.picam.read()
         _, jpeg = cv.imencode(".jpg", frame)
         return jpeg.tobytes()
 
-    def RecordStream(self, buttonPressed):
-        #Record the stream
+    def RecordStream(self, active=None):
+        #Record the live stream
         frame = self.picam.read()
         frame = imutils.resize(frame, width=pxl)
         fourcc = cv.VideoWriter_fourcc("MJPG")# video compression format and color/pixel format of video
         (h, w) = frame.shape[:2]
         writer = cv.VideoWriter("Video/Video.avi", fourcc, fps, (w, h), True)
         writer.write(frame)# Test this module if it works or not
-        if buttonPressed == True:
+        if active == False:
             writer.released()
             pass
 
     def get_Person(self):
-        #find the person in the stream
+        #find the person in the camaera stream
         frame = self.picam.read()# get the camera from the stream
         frame = imutils.resize(frame, width=pxl)
         gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)

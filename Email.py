@@ -1,3 +1,5 @@
+#@author Jamie Ha
+#created: 17/03/18
 import threading
 import time
 import smtplib
@@ -7,6 +9,9 @@ from email.mime.image import MIMEImage
 from email.mime.text import MIMEText
 from email.mime.base import MIMEBase
 '''
+CHECK BEFORE THE COMPLETED PROJECT:
+        - Test if the threading of the email and main files work together
+        - Test if it records and sends the video
 Have the email service run through this class
 Have perminent email addresses usrname&passwrds in the module
 Sources:
@@ -14,25 +19,24 @@ Sources:
 - http://naelshiab.com/tutorial-send-email-python/
 - https://www.tutorialspoint.com/python3/python_sending_email.html
 '''
-# Make sure the this class is threaded/processed
+# The email is threaded for optimal efficiency.
+# Check if this module works
 class Emails(threading.Thread):
     host = 'smtp.gmail.com'
     port = 465# port for gmail
-    login = 'e9261733@gmail.com'
+    login = 'e9261733@gmail.com'# email login for entering in the gmail webserver
     password = 'emailpassword'
-    clients = ['e94282861@gmail.com']
+    clients = ['e94282861@gmail.com']# recipients
     localTime = time.asctime(time.localtime(time.time()))
 
-    def __init__(self, message):
+    def __init__(self, message, orginal_path):
         threading.Thread.__init__(self)# threading the email module
         self.message = message
-        self.imageFileName = imageFileName
-        self.path = path
+        self.orginal_path = orginal_path
         #The message of the email
-    '''
-    def sendVideo(self, orginal_path):
-        # find a way to send a video over the gmail webserver
-        threadLock.acquire()
+
+    def sendVideo(self):
+        # Send a video over through email
         mainMessage = 'Video Recorded:- ' + Emails.localTime
         filename = 'Video.avi'
         try:
@@ -42,7 +46,7 @@ class Emails(threading.Thread):
             msg['To'] = ', '.join(Emails.clients)
             text = MIMEText(mainMessage)
             video = MIMEBase('application', "octet-stream")
-            file = open(orginal_path+filename, "rb")
+            file = open(self.orginal_path+filename, "rb")
             video.set_payload(file.read())
             Encoders.encode_base64(video)
             msg.attach(video)
@@ -54,11 +58,9 @@ class Emails(threading.Thread):
         except:
             lgEmail.File("SendingVideo[ERROR]")# log: email not sent
             pass
-        threadLock.release()
-        thread.join()
-    '''
+
     def sendMail(self, frame):
-        threadLock.acquire()
+        # send the email with frame
         lgEmail = Log(Emails.localTime, self.path)
         try:
             msg = MIMEMultipart()# sending multiple attachments e.g. images, texts
@@ -66,7 +68,7 @@ class Emails(threading.Thread):
             msg['From'] = Emails.login# login into the email
             msg['To'] = ', '.join(Emails.clients)
             text = MIMEText(self.message)# txt of the email
-            image = MIMEImage(frame)# image of the email
+            image = MIMEImage(self.frame)# image of the email
             msg.attach(text)#send text over email
             msg.attach(image)#attach the image to the email
             server = smtplib.SMTP_SSL(Emails.host, Emails.port)
@@ -77,5 +79,23 @@ class Emails(threading.Thread):
         except:
             lgEmail.File("SendingEmail [ERROR]")# log: email not sent
             pass
-        threadLock.release()
-        thread.join()
+
+    def runFunc(self, function_to_call, frame=None):# decides whether it is going to run either the send email or video option
+        threadLock = threading.Lock()
+        threadLock.acquire()
+        # this will run the intended function
+        if function_to_call == "sendVideo":
+            sendVideo()
+        elif function_to_call == "sendMail":
+            sendMail(frame)
+        threadLock.release()# end the thread
+
+'''
+Status:
+runFunc:
+- Test if the thread releases or not
+sendVideo func:
+- Testing this function
+sendMail func:
+- Make sure this works
+'''
