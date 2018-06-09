@@ -6,7 +6,6 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.image import MIMEImage
 from email.mime.text import MIMEText
 from email.mime.base import MIMEBase
-from email import Encoders
 '''
 Have the email service run through this class
 Have perminent email addresses usrname&passwrds in the module

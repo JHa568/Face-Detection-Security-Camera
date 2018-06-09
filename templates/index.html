@@ -1,0 +1,24 @@
+!DOCTYPE html>
+	<head>
+    <!-- tab title -->
+		<title> {{ title }} </title>
+	</head>
+
+	<body>
+    <!-- This is the upload of the live camera feed-->
+    <h1>Security Live Feed</h1>
+    <img id='bg' src="{{ url_for('live_stream') }}">
+    <!--Status of the camera recording-->
+    <p> Recording Status:
+		{% if record == True %}
+			currently running (<a href="/live_stream/record_stream/off">turn off</a>)
+		{% else %}
+			currently not running (<a href="/live_stream/record_stream/on">turn on</a>)
+		{% endif %}
+		</p>
+    <!-- 'Record' or 'Stop recording' message appear for the user -->
+		{% if message %}
+		<h2>{{ message }}</h2>
+		{% endif %}
+	</body>
+</html>
