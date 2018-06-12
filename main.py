@@ -5,7 +5,7 @@ import numpy
 import threading# Use for email
 import cv2 as cv
 from flask import Flask, render_template, Response
-from Camera import Camera
+from Camera import VideoCamera
 from logFiles import Log
 from MessageFormat import Format
 from Email import Emails
@@ -17,7 +17,7 @@ original_path = '/home/pi/Desktop/FrontDoorDetectProject/'
 DateNTime = time.asctime(time.localtime(time.time()))# Time stamp on the image
 logEmailSent = Log(DateNTime, original_path)
 em = Emails(Format.message, original_path)# getting the image captured
-piVCam = VideoCamera(orginal_path, DateNTime)
+piVCam = VideoCamera(original_path, DateNTime)
 previousTime = 0# temporary storage of the time
 app = Flask(__name__)# creation of Webserver
 
