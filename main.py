@@ -6,13 +6,9 @@ import threading# Use for email
 import cv2 as cv
 from flask import Flask, render_template, Response
 from Camera import Camera
-from picamera import PiCamera
 from logFiles import Log
 from MessageFormat import Format
 from Email import Emails
-from Timer import Timer
-from picamera.array import PiRGBArray
-
 '''
 Inspired by Hacker Shack:
 -   https://github.com/HackerShackOfficial/Smart-Security-Camera

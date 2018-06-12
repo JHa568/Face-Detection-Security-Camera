@@ -19,6 +19,7 @@ Sources:
 - http://naelshiab.com/tutorial-send-email-python/
 - https://www.tutorialspoint.com/python3/python_sending_email.html
 '''
+
 # The email is threaded for optimal efficiency.
 # Check if this module works
 class Emails(threading.Thread):

@@ -9,7 +9,7 @@ import time
 pxl = 256
 res = (pxl,pxl)
 fps = 25
-haarcascadeHeadNShoulders = "HS.xml"# Use a different model
+haarcascade = "haarcascade_frontalface.xml"# Use a different model
 
 class VideoCamera(object):
     def __init__(self, original_path, date_n_time):
@@ -40,19 +40,19 @@ class VideoCamera(object):
             pass
 
     def get_Person(self):
-        #find the person in the camaera stream
+        #find the person in the camara stream
         frame = self.picam.read()# get the camera from the stream
         frame = imutils.resize(frame, width=pxl)
         gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
         personDetected = False
-        haarcascadeClassifier = cv.CascadeClassifier(haarcascadeHeadNShoulders)
+        haarcascadeClassifier = cv.CascadeClassifier(haarcascade)# face detection
         detectPerson = haarcascadeClassifier.detectMultiScale(gray,
                                                           scaleFactor=1.2,
                                                           minNeighbors=3,
                                                           minSize=(30,30),
                                                           flags=cv.CASCADE_SCALE_IMAGE)
-        if len(detectPerson) > 0:
-            personDetected = True# if detected return True
+        if len(detectPerson) > 0:# finding face on the camera
+            personDetected = True# return found face
 
         for (x,y,w,h) in detectPerson:
             cv.rectangle(frame, (x,y), (x+w, y+h), (0, 255, 0), 2)
