@@ -14,6 +14,7 @@ Inspired by Hacker Shack:
 -   https://github.com/HackerShackOfficial/Smart-Security-Camera
 '''
 DateNTime = time.asctime(time.localtime(time.time()))# Time stamp on the image
+global DateNTime
 logAction = Log(DateNTime)
 em = Emails(Format.message)# getting the image captured
 piVCam = VideoCamera(DateNTime)
