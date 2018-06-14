@@ -1,7 +1,7 @@
 #@author Jamie Ha
 #created: 17/03/18
 import time
-import numpy
+import numpy as np
 import threading# Use for email
 import cv2 as cv
 from flask import Flask, render_template, Response
@@ -13,29 +13,34 @@ from Email import Emails
 Inspired by Hacker Shack:
 -   https://github.com/HackerShackOfficial/Smart-Security-Camera
 '''
-original_path = '/home/pi/Desktop/FrontDoorDetectProject/'
 DateNTime = time.asctime(time.localtime(time.time()))# Time stamp on the image
-logEmailSent = Log(DateNTime, original_path)
-em = Emails(Format.message, original_path)# getting the image captured
-piVCam = VideoCamera(original_path, DateNTime)
+logAction = Log(DateNTime)
+em = Emails(Format.message)# getting the image captured
+piVCam = VideoCamera(DateNTime)
 previousTime = 0# temporary storage of the time
 app = Flask(__name__)# creation of Webserver
 
 def get_PersonInFrame():
     # Stop sending emails of person after 9 minutes
-    global previousTime
+    global timeCaptured
+    timeCaptured = time.time()
+    threadLock = threading.Lock()
     while True:
-        frame, found_person = piVCam.get_PersonInFrame()
-        holdTimer = 540# 9 minute timer
-        currentTime = time.time()
-        if previousTime == 0:
-            previousTime = currentTime
-        else:
-            while found_person and (currentTime - previousTime) < holdTimer:
-                currentTime = time.time()
-            em.runFunc("sendMail", piVCam.SaveImage())# Put the email sending into a thread
-            previousTime = 0
-
+        try:
+            frame, found_person = piVCam.get_PersonInFrame()
+            holdTimer = 10# 540 seconds timer
+            currentTime = time.time()
+            if found_person and (currentTime - timeCaptured) >= holdTimer:
+                print("Sending")
+                threadLock.acquire()
+                em.sendMail(piVCam.get_frame())
+                threadLock.release()
+                print("Done!!!")
+                timeCaptured = currentTime
+        except:
+            print("Error with detecting person")
+            logAction.File("[Error] with detecting person")
+            break
 @app.route('/')
 def mainFunctions():
     # Title of the webpage
@@ -44,31 +49,34 @@ def mainFunctions():
     }
     return render_template('index.html', **templateData)# puts it into the main html file
 '''
-CamFeed and live_stream; from Hacker Shack
+CamFeed and live_stream: from Hacker Shack
 '''
-def camFeed(camera):
+def camFeed():
     # Uploads the frame to webserver
     while True:
-        frame = camera.get_frame()
+        #frame, _ = piVCam.get_PersonInFrame()#with rect
+        frame =  piVCam.get_frame()#without rect
         yield (b'--frame\r\n'
                b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
 
 @app.route('/live_stream')
 def live_stream():# shows the live stream of the camera
-    return Response(camFeed(video_camera),
+    return Response(camFeed(),
                     mimetype='multipart/x-mixed-replace; boundary=frame')
 
 @app.route('/live_stream/record_stream/<recording>')
-def record():
+def Record(recording):# Test the logic of this function
     # recording the live stream here when button is pressed or not
     record = False
-    message = ''
+    message = ""
     if recording == "on":
         message = "Recording"
         record = True
+        #piVCam.RecordStream(record)# this is to record the stream
     elif recording == "off":
         message = "Not recording"
         record = False
+        #piVCam.RecordStream(record)
 
     templateData = {
         'message': message,
@@ -78,6 +86,6 @@ def record():
 
 if __name__ == '__main__':
     t = threading.Thread(target=get_PersonInFrame, args=())
-    t.daemon = True #
+    t.daemon = True
     t.start()
-    app.run(host='0.0.0.0', debug=True)
+    app.run(host='0.0.0.0', debug=False)

@@ -12,24 +12,24 @@ fps = 25
 haarcascade = "haarcascade_frontalface.xml"# Use a different model
 
 class VideoCamera(object):
-    def __init__(self, original_path, date_n_time):
-        self.original_path = orginal_path
+    def __init__(self, date_n_time):
         self.date_n_time = date_n_time
-        self.picam = VideoStream(usePiCamera=True, resolution=res, framerate=fps).start()
-        self.picam = imutils.rotate(self.picam, angle=180)# rotates the camera 180 degrees
+        self.picam = VideoStream(usePiCamera=True, resolution=(256,256), framerate=25).start()
         print("{CPU INFO}: Camera warming up......")
         time.sleep(2)
         print("Starting......")
 
-    def SaveImage(self):
+    def get_frame(self):
         #Captures the image
         frame = self.picam.read()
+        frame = imutils.rotate(frame, angle=180)
         _, jpeg = cv.imencode(".jpg", frame)
         return jpeg.tobytes()
 
     def RecordStream(self, active=None):
         #Record the live stream
         frame = self.picam.read()
+        frame = imutils.rotate(frame, angle=180)
         frame = imutils.resize(frame, width=pxl)
         fourcc = cv.VideoWriter_fourcc("MJPG")# video compression format and color/pixel format of video
         (h, w) = frame.shape[:2]
@@ -39,9 +39,10 @@ class VideoCamera(object):
             writer.released()
             pass
 
-    def get_Person(self):
+    def get_PersonInFrame(self):
         #find the person in the camara stream
-        frame = self.picam.read()# get the camera from the stream
+        frame = self.picam.read()
+        frame = imutils.rotate(frame, angle=180)
         frame = imutils.resize(frame, width=pxl)
         gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
         personDetected = False

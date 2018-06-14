@@ -21,6 +21,6 @@ From: [%s]
 To: %s
 %s\n
 %s\n\n%s. %s.\n
-Link to live feed: www.google.com [example of link]
+Link to live feed: 192.168.1.74:5000 [example of link]
     ''' % (Emails.localTime, breaker0, Emails.login, breaker1, Emails.clients, breaker0,
     sen1, sen2, sen3)
