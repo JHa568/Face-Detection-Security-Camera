@@ -2,9 +2,9 @@
 #created: 17/03/18
 import time
 import numpy as np
-import threading# Use for email
+import threading
 import cv2 as cv
-from flask import Flask, render_template, Response
+from flask import Flask, render_template, Response, abort, request
 from Camera import VideoCamera
 from logFiles import Log
 from MessageFormat import Format
@@ -14,22 +14,22 @@ Inspired by Hacker Shack:
 -   https://github.com/HackerShackOfficial/Smart-Security-Camera
 '''
 DateNTime = time.asctime(time.localtime(time.time()))# Time stamp on the image
-global DateNTime
 logAction = Log(DateNTime)
 em = Emails(Format.message)# getting the image captured
 piVCam = VideoCamera(DateNTime)
 previousTime = 0# temporary storage of the time
 app = Flask(__name__)# creation of Webserver
-
+record = None
 def get_PersonInFrame():
     # Stop sending emails of person after 9 minutes
     global timeCaptured
+    global record
     timeCaptured = time.time()
     threadLock = threading.Lock()
     while True:
         try:
             frame, found_person = piVCam.get_PersonInFrame()
-            holdTimer = 10# 540 seconds timer
+            holdTimer = 240# 4min timer
             currentTime = time.time()
             if found_person and (currentTime - timeCaptured) >= holdTimer:
                 print("Sending")
@@ -42,6 +42,7 @@ def get_PersonInFrame():
             print("Error with detecting person")
             logAction.File("[Error] with detecting person")
             break
+
 @app.route('/')
 def mainFunctions():
     # Title of the webpage
@@ -68,16 +69,22 @@ def live_stream():# shows the live stream of the camera
 @app.route('/live_stream/record_stream/<recording>')
 def Record(recording):# Test the logic of this function
     # recording the live stream here when button is pressed or not
-    record = False
+    global record
     message = ""
+    #threadLock = threading.Lock()
+    locked = False
     if recording == "on":
-        message = "Recording"
+        message = "Finished Recording"
         record = True
-        #piVCam.RecordStream(record)# this is to record the stream
+        print("Thread Acquired.............")
+        recThread = threading.Thread(target=piVCam.RecordStream, args=(record,))
+        recThread.start()
+        recThread.join()
+        print("Thread Finished.............")
     elif recording == "off":
-        message = "Not recording"
+        message = "Press once to record video for 5 mins"
         record = False
-        #piVCam.RecordStream(record)
+        print("Resetted..........")
 
     templateData = {
         'message': message,

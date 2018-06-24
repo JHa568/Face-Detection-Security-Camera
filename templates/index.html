@@ -11,14 +11,16 @@
     <!--Status of the camera recording-->
 	    <p> Recording Status:
 				{% if record == True %}
-						currently running (<a href="/live_stream/record_stream/off">turn off</a>)
+						Finished Recording (<a href="/live_stream/record_stream/off">RESET</a>)
 				{% else %}
-						currently not running (<a href="/live_stream/record_stream/on">turn on</a>)
+						Not Recording(<a href="/live_stream/record_stream/on">RECORD</a>)
 				{% endif %}
 			</p>
     <!-- 'Record' or 'Stop recording' message appear for the user -->
 			{% if message %}
 				<h2>{{ message }}</h2>
+			{% else %}
+				<h2>Press once to record video for 5 mins</h2>
 			{% endif %}
 	</body>
 </html>

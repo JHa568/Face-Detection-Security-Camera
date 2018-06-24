@@ -1,6 +1,7 @@
-#@author Jamie Ha
-#created: 17/03/18
+# @author Jamie Ha
+# created: 17/03/18
 from imutils.video import VideoStream# to be more efficient directly call 'PiVideoStream'
+from Email import Emails
 import cv2 as cv
 import numpy as np
 import imutils
@@ -20,27 +21,34 @@ class VideoCamera(object):
         print("Starting......")
 
     def get_frame(self):
-        #Captures the image
+        # Captures the image
         frame = self.picam.read()
         frame = imutils.rotate(frame, angle=180)
         _, jpeg = cv.imencode(".jpg", frame)
         return jpeg.tobytes()
 
-    def RecordStream(self, active=None):
-        #Record the live stream
-        frame = self.picam.read()
-        frame = imutils.rotate(frame, angle=180)
-        frame = imutils.resize(frame, width=pxl)
-        fourcc = cv.VideoWriter_fourcc("MJPG")# video compression format and color/pixel format of video
-        (h, w) = frame.shape[:2]
-        writer = cv.VideoWriter("Video/Video.avi", fourcc, fps, (w, h), True)
-        writer.write(frame)# Test this module if it works or not
-        if active == False:
-            writer.released()
-            pass
+    def RecordStream(self, record):
+        # Record the live stream
+        #em = Emails()
+        fourcc = cv.VideoWriter_fourcc(*"MJPG")# video compression format and color/pixel format of video
+        writer = None
+        prevTime = time.time()
+        currentTime = 0
+        while (currentTime - prevTime) <= 300:
+            # record for 5 mins
+            currentTime = time.time()
+            frame = self.picam.read()# gets the frame from stream
+            frame = imutils.rotate(frame, angle=180)
+            frame = imutils.resize(frame, width=pxl)
+            if writer == None:
+                (h, w) = frame.shape[:2]
+                writer = cv.VideoWriter("Video/Video.avi", fourcc, fps, (w, h), True)
+            output = np.zeros((h,w,3), dtype='uint8')
+            output[0:h, 0:w] = frame
+            writer.write(output)# Test this module if it works or not
 
     def get_PersonInFrame(self):
-        #find the person in the camara stream
+        # find the person in the camara stream
         frame = self.picam.read()
         frame = imutils.rotate(frame, angle=180)
         frame = imutils.resize(frame, width=pxl)
@@ -57,7 +65,6 @@ class VideoCamera(object):
 
         for (x,y,w,h) in detectPerson:
             cv.rectangle(frame, (x,y), (x+w, y+h), (0, 255, 0), 2)
-
         _, jpeg = cv.imencode('.jpg', frame)# image of frame w/ rectangle
 
         return (jpeg.tobytes(), personDetected)
