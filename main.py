@@ -6,7 +6,8 @@ import threading
 import cv2 as cv
 from flask import Flask, render_template, Response, abort, request
 from Camera import VideoCamera
-from logFiles import Log
+from logFiles
+import Log
 from MessageFormat import Format
 from Email import Emails
 '''
@@ -71,17 +72,18 @@ def Record(recording):# Test the logic of this function
     # recording the live stream here when button is pressed or not
     global record
     message = ""
-    #threadLock = threading.Lock()
     locked = False
-    if recording == "on":
+    if recording == "record":
+        # record the video for 5mins
         message = "Finished Recording"
         record = True
         print("Thread Acquired.............")
         recThread = threading.Thread(target=piVCam.RecordStream, args=(record,))
-        recThread.start()
-        recThread.join()
+        recThread.start()# execute the program
+        recThread.join()# once complete terminate
         print("Thread Finished.............")
-    elif recording == "off":
+    elif recording == "reset":
+        # reset to record again
         message = "Press once to record video for 5 mins"
         record = False
         print("Resetted..........")

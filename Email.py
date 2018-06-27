@@ -36,7 +36,7 @@ class Emails(threading.Thread):#fully thread this module
         self.message = message
         #The message of the email
 
-    def sendVideo(self):#Check this if this works!!!
+    def sendVideo(self):# create button to send mail
         # Send a video over through email
         lgEmail = Log(Emails.localTime)
         mainMessage = 'Video Recorded:- ' + Emails.localTime
@@ -48,11 +48,11 @@ class Emails(threading.Thread):#fully thread this module
             msg['To'] = ', '.join(Emails.clients)
             text = MIMEText(mainMessage)
             video = MIMEBase('application', "octet-stream")
-            file = open('Video/'+filename, "rb")
+            file = open('Video/'+filename, "rb")# read in binary format
             video.set_payload(file.read())
-            encoders.encode_base64(video)
-            video.add_header("Content-Disposition", 'attachment; filename"%s"' % filename)
-            msg.attach(video)
+            encoders.encode_base64(video)# encode the video in a sendable format
+            video.add_header("Content-Disposition", 'attachment; filename"%s"' % filename)# make it as a readable/accessible file to the recipient
+            msg.attach(video)# attach video (encoded) to email
             server = smtplib.SMTP_SSL(Emails.host, Emails.port)
             server.login(Emails.login, Emails.password)
             server.sendmail(Emails.login, Emails.clients, msg.as_string())#sends the email (with attachmemnts and texts)
