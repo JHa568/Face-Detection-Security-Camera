@@ -13,5 +13,5 @@ class Log:
         noOfLogs = len(tempArray)# elements within a temporary array
         logString = "%s) %s: %s" % (noOfLogs, message, self.DateNTime)
         fileLog = open(logName, 'a')
-        fileLog.write(str(logString)+'\n')
+        fileLog.write(str(logString)+'\n')# write to log file
         fileLog.close()

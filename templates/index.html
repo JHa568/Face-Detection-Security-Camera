@@ -11,9 +11,9 @@
     <!--Status of the camera recording-->
 	    <p> Recording Status:
 				{% if record == True %}
-						Finished Recording (<a href="/live_stream/record_stream/reset">RESET</a>)
+						Finished Recording (<a href="/live_stream/record_stream/on">RESET</a>)
 				{% else %}
-						Not Recording(<a href="/live_stream/record_stream/record">RECORD</a>)
+						Not Recording(<a href="/live_stream/record_stream/off">RECORD</a>)
 				{% endif %}
 			</p>
     <!-- 'Record' or 'Stop recording' message appear for the user -->

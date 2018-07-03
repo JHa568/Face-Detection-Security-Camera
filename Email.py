@@ -36,7 +36,8 @@ class Emails(threading.Thread):#fully thread this module
         self.message = message
         #The message of the email
 
-    def sendVideo(self):# create button to send mail
+    def sendVideo(self):
+        # This maybe used in the future
         # Send a video over through email
         lgEmail = Log(Emails.localTime)
         mainMessage = 'Video Recorded:- ' + Emails.localTime
@@ -48,11 +49,11 @@ class Emails(threading.Thread):#fully thread this module
             msg['To'] = ', '.join(Emails.clients)
             text = MIMEText(mainMessage)
             video = MIMEBase('application', "octet-stream")
-            file = open('Video/'+filename, "rb")# read in binary format
+            file = open('Video/'+filename, "rb")
             video.set_payload(file.read())
-            encoders.encode_base64(video)# encode the video in a sendable format
-            video.add_header("Content-Disposition", 'attachment; filename"%s"' % filename)# make it as a readable/accessible file to the recipient
-            msg.attach(video)# attach video (encoded) to email
+            encoders.encode_base64(video)
+            video.add_header("Content-Disposition", 'attachment; filename"%s"' % filename)
+            msg.attach(video)
             server = smtplib.SMTP_SSL(Emails.host, Emails.port)
             server.login(Emails.login, Emails.password)
             server.sendmail(Emails.login, Emails.clients, msg.as_string())#sends the email (with attachmemnts and texts)
@@ -83,12 +84,3 @@ class Emails(threading.Thread):#fully thread this module
             lgEmail.File("SendingEmail [ERROR]")# log: email not sent
             pass
 
-'''
-Status:
-runFunc:
-- Test if the thread releases or not
-sendVideo func:
-- Testing this function
-sendMail func:
-- Make sure this works
-'''

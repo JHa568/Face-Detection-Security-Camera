@@ -6,46 +6,37 @@ import cv2 as cv
 import numpy as np
 import imutils
 import time
+import threading
 
 pxl = 256
 res = (pxl,pxl)
 fps = 25
 haarcascade = "haarcascade_frontalface.xml"# Use a different model
+recThreadAlive = False
+activeRecording = False
 
 class VideoCamera(object):
-    def __init__(self, date_n_time):
+    
+    def __init__(self, date_n_time, activeRecording):
         self.date_n_time = date_n_time
-        self.picam = VideoStream(usePiCamera=True, resolution=(256,256), framerate=25).start()# live stream of camera
+        self.activeRecording = activeRecording
+        self.picam = VideoStream(usePiCamera=True, resolution=(400,304), framerate=25).start()
+        # ^ Activate the camera
         print("{CPU INFO}: Camera warming up......")
-        time.sleep(2)# warming up camera
+        time.sleep(2)
         print("Starting......")
 
     def get_frame(self):
         # Captures the image
-        frame = self.picam.read()# get the frame from the stream
-        frame = imutils.rotate(frame, angle=180)# rotate the image
-        _, jpeg = cv.imencode(".jpg", frame)
+        frame = self.picam.read()# get frame
+        frame = imutils.rotate(frame, angle=180)
+        _, jpeg = cv.imencode(".jpg", frame)# convert the frame to a jpeg file
         return jpeg.tobytes()
 
-    def RecordStream(self, record):
-        # Record the live stream
-        fourcc = cv.VideoWriter_fourcc(*"MJPG")# video compression format and color/pixel format of video
-        writer = None
-        prevTime = time.time()
-        currentTime = 0
-        while (currentTime - prevTime) <= 300:
-            # record for 5 mins
-            currentTime = time.time()
-            frame = self.picam.read()# gets the frame from stream
-            frame = imutils.rotate(frame, angle=180)# rotate the frame
-            frame = imutils.resize(frame, width=pxl)# Change the size of the picture
-            if writer == None:
-                (h, w) = frame.shape[:2]# shape of the frame
-                writer = cv.VideoWriter("Video/Video.avi", fourcc, fps, (w, h), True)# write the file "Video.avi"
-            output = np.zeros((h, w, 3), dtype='uint8') # size of the output
-            output[0:h, 0:w] = frame # frame is in an array format
-            writer.write(output)# writes the 'output' to 'Video.avi'
-
+    def get_frame0(self):
+        frame = self.picam.read()
+        return frame
+    
     def get_PersonInFrame(self):
         # find the person in the camara stream
         frame = self.picam.read()
@@ -63,8 +54,8 @@ class VideoCamera(object):
             personDetected = True# return found face
 
         for (x,y,w,h) in detectPerson:
-            cv.rectangle(frame, (x,y), (x+w, y+h), (0, 255, 0), 2)# draw rectangle around the person
-
+            cv.rectangle(frame, (x,y), (x+w, y+h), (0, 255, 0), 2)
+            
         _, jpeg = cv.imencode('.jpg', frame)# image of frame w/ rectangle
 
         return (jpeg.tobytes(), personDetected)
