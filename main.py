@@ -4,7 +4,7 @@ import time
 import numpy as np
 import threading
 import cv2 as cv
-import imutils
+import imutils 
 from flask import Flask, render_template, Response, abort, request
 from Camera import VideoCamera
 from logFiles import Log
@@ -14,10 +14,9 @@ from Email import Emails
 Acknowledgements:
 -   Hacker Shack
 -   PyImageSearch blog posts
--   StackOverflow community
+-   StackOverflow community 
 '''
 record = None
-message = ""
 DateNTime = time.asctime(time.localtime(time.time()))# Time stamp on the image
 logAction = Log(DateNTime)# logs: errors or successes
 em = Emails(Format.message)# getting the image captured
@@ -49,7 +48,7 @@ def get_PersonInFrame():
                 print("Error with detecting person")
                 logAction.File("[Error] Detecting person")
                 break
-
+    
 @app.route('/')
 def mainFunctions():
     # Title of the webpage
@@ -75,15 +74,14 @@ def live_stream():# shows the live stream of the camera
 
 def RecordStream():
     # records the video stream
+    print("Started recording")
     try:
         fourcc = cv.VideoWriter_fourcc(*"MJPG")# video compression format and color/pixel format of video
         writer = None
-        prevTime = time.time()
-        currentTime = 0
-        while (currentTime - prevTime) <= 300 and record == True:
+        while record == True: 
             # record for 5 minutes or until the not recording hyperlink is pressed
             currentTime = time.time()
-            frame = piVCam.get_frame0()# gets the frame from stream
+            frame = piVCam.get_frame0()# gets the frame from stream 
             frame = imutils.rotate(frame, angle=180)
             frame = imutils.resize(frame, width=256)
             if writer == None:
@@ -94,41 +92,39 @@ def RecordStream():
             output[0:h, 0:w] = frame
             writer.write(output)# Test this module if it works or not
         writer.release()# stop writing to file
-        record = False# leave this here
-        message = "Not Recording"# get rid of this if you dont need it
-        logAction.File("[Sucess]: Recorded Video")# log it is recording
+        logAction.File("[Sucess]: Recorded Video")
         print("Not Recording")
     except:
-        # This will occur when an error has occured
-        logAction.File("[Error]: Recording Video")
-        record = False
-        message = "Not Recording"
-        print("Error has occured")
-
+        logAction.File("[Error]: Recorded Video")
+        print("Recording Failed")
+     
 @app.route('/live_stream/record_stream/<recording>')
 def Record(recording):
     # recording the live stream here when button is pressed or not
     global record
-    global message
     recThread = threading.Thread(target=RecordStream)
+    message = ""
     if recording == "on":
         message = "Recording"
         record = True
-        recThread.start()# recording has started
-
+        recThread.start()# record has started
+        
     elif recording == "off":
         message = "Not Recording"
         record = False# flag to terminates live stream
-
+    
     templateData = {
         'message': message,
         'record': record
     }
-
+    
     return render_template('index.html', **templateData)# put in the main html file
-
+        
 if __name__ == '__main__':
     t = threading.Thread(target=get_PersonInFrame)
     t.daemon = True
     t.start()# start getting people from the frame
     app.run(host='0.0.0.0', debug=False)
+            
+        
+        
